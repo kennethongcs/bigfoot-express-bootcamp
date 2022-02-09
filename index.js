@@ -5,6 +5,7 @@ import sortBy from 'lodash/sortBy.js';
 const app = express();
 app.set('view engine', 'ejs');
 
+// ejs - display entire list of sightings
 app.get('/', (req, res) => {
   read('data.json', (err, content) => {
     if (err) {
@@ -12,6 +13,26 @@ app.get('/', (req, res) => {
     }
     const data = content.sightings;
     res.render('sightings', { data });
+  });
+});
+// ejs - display entire list of sightings by years
+app.get('/years', (req, res) => {
+  read('data.json', (err, content) => {
+    if (err) {
+      console.log('Read error ejs', err);
+    }
+    const data = content.sightings;
+    // extract years from DATA into new var
+    const dataYears = data.map((years) => {
+      return years.YEAR;
+    });
+    // remove duplicates and add into new array
+    const dataYearsNoDupes = [...new Set(dataYears)];
+    // sort(?) in ascending order
+    dataYearsNoDupes.sort((a, b) => {
+      return a - b;
+    });
+    res.render('years', { dataYearsNoDupes });
   });
 });
 
@@ -30,7 +51,6 @@ app.get('/sightings/:index', (request, response) => {
         </body>
       </html>
     `;
-    const content2 = '';
     response.send(content);
   });
 });
@@ -42,14 +62,14 @@ app.get('/year-sightings/:year', (request, response) => {
       return sighting.YEAR === request.params.year;
     });
     let string = '';
+    string += `<h1>Year: ${request.params.year}<br/></h1>`;
     filteredSightings.forEach((sighting) => {
-      string += `${sighting.YEAR}<br/>`;
       string += `${sighting.STATE}<br/>`;
     });
     content = `
       <html>
         <body>
-          <h1>hello</h1>
+        Click <a href="/years"> here </a> to go back to list of years.
           ${string}<br/>
         </body>
       </html>
@@ -61,27 +81,14 @@ app.get('/year-sightings/:year', (request, response) => {
 
 app.get('/year-sightings', (request, response) => {
   read('data.json', (err, content) => {
-    const sightings = content.sightings;
-    // sightings.sort((a, b) => {
-    //   if (request.query.sort === 'asc') {
-    //     if (a.STATE < b.STATE) {
-    //       return -1;
-    //     }
-    //     if (a.STATE > b.STATE) {
-    //       return 1;
-    //     }
-    //     return 0;
-    //   }
-    // });
-
+    const { sightings } = content;
+    // sort sightings in ascending order
     const sortedSightings = sortBy(sightings, ['STATE']);
-
     // console.log(sightings);
     const string = sortedSightings.map((sighting) => {
       return `${sighting.STATE}<br/>`;
     });
     // string.sort();
-    console.log(string);
     content = `
       <html>
         <body>
@@ -90,7 +97,6 @@ app.get('/year-sightings', (request, response) => {
         </body>
       </html>
     `;
-    const content2 = '';
     response.send(content);
   });
 });
