@@ -3,6 +3,17 @@ import { read } from './dataStorage.js';
 import sortBy from 'lodash/sortBy.js';
 
 const app = express();
+app.set('view engine', 'ejs');
+
+app.get('/', (req, res) => {
+  read('data.json', (err, content) => {
+    if (err) {
+      console.log('Read error ejs', err);
+    }
+    const data = content.sightings;
+    res.render('sightings', { data });
+  });
+});
 
 app.get('/sightings/:index', (request, response) => {
   read('data.json', (err, content) => {
@@ -13,7 +24,9 @@ app.get('/sightings/:index', (request, response) => {
           <h1>hello</h1>
           ${sightings.YEAR}<br/>
           ${sightings.STATE}<br/>
-          ${sightings.OBSERVED}<br/>
+          ${sightings.OBSERVED}<br/><br/>
+
+          Click <a href="/">here</a> to go back to index. 
         </body>
       </html>
     `;

@@ -1,0 +1,9 @@
+<html>
+  <body>
+    <h1>Link of sightings are below:</h1>
+  </body>
+</html>
+
+<% for( let index = 0; index < data.length; index++ ) { %>
+<p><a href="/sightings/<%= index %> ">Sighting <%= `${index}` %> </a></p>
+<% } %>
