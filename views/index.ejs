@@ -1,0 +1,15 @@
+<html>
+  <body>
+    Click on the links below to filter the sightings of UFOs made in the past
+    100 years:
+    <ul>
+      <% for( let index = 0; index < uniqueKeys.length; index++ ) { %>
+      <li>
+        <a href="/?sortBy=<%= uniqueKeys[index].toLowerCase() %> ">
+          <%= uniqueKeys[index] %>
+        </a>
+      </li>
+      <% } %>
+    </ul>
+  </body>
+</html>

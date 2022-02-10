@@ -1,21 +1,63 @@
 import express from 'express';
-import { read } from './dataStorage.js';
 import sortBy from 'lodash/sortBy.js';
+import { read } from './dataStorage.js';
 
 const app = express();
 app.set('view engine', 'ejs');
 
-// ejs - display entire list of sightings
-app.get('/', (req, res) => {
+// ejs - display each key in DATA except for observed
+app.get('/index', (req, res) => {
   read('data.json', (err, content) => {
     if (err) {
-      console.log('Read error ejs', err);
+      console.log('Read error', err);
     }
-    const data = content.sightings;
-    res.render('sightings', { data });
+    // get sorting param from URL
+    const { sortBy } = req.query;
+    // get array of sightings from DATA
+    const { sightings } = content;
+    // loop through all keys and store them except for observed
+    let allKeys = [];
+    const allAttributes = sightings.map((attribute) => {
+      for (let [key] of Object.entries(attribute)) {
+        if (key !== 'OBSERVED') {
+          allKeys.push(key);
+        }
+      }
+    });
+    // remove duplicates from array
+    const uniqueKeys = [...new Set(allKeys)];
+    // sends uniqueKeys to EJS in an object
+    res.render('index', { uniqueKeys });
   });
 });
-// ejs - display entire list of sightings by years
+
+app.get('/', (req, res) => {
+  // DOING
+  read('data.json', (err, content) => {
+    const sorting = req.query.sortBy;
+    const uppercase = sorting.toUpperCase();
+    const { sightings } = content;
+    if (err) {
+      console.log('Read error', err);
+    }
+    const sortedSightings = sortBy(sightings, [uppercase]);
+    res.render('indexFilter', { sortedSightings });
+    // console.log(sortedSightings);
+  });
+});
+
+// ejs - display entire list of sightings //
+// app.get('/', (req, res) => {
+//   read('data.json', (err, content) => {
+//     if (err) {
+//       console.log('Read error ejs', err);
+//     }
+//     const data = content.sightings;
+//     res.render('sightings', { data });
+//   });
+// });
+
+// ejs - display entire list of sightings by years //
 app.get('/years', (req, res) => {
   read('data.json', (err, content) => {
     if (err) {
@@ -74,7 +116,6 @@ app.get('/year-sightings/:year', (request, response) => {
         </body>
       </html>
     `;
-    const content2 = '';
     response.send(content);
   });
 });
