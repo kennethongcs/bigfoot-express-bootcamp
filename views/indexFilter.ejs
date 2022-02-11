@@ -1,3 +1,8 @@
-<% for( let [key,value] of Object.entries(sortedSightings) ) { %>
-<p><%= key %>: <%= value %></p>
-<%} %>
+<% for( let index = 0; index < sortedSightings.length; index++ ) { %>
+<p>The year is: <%= sortedSightings[index].YEAR %></p>
+<p>The season is: <%= sortedSightings[index].SEASON %></p>
+<p>The county is: <%= sortedSightings[index].COUNTY %></p>
+<p>The state is: <%= sortedSightings[index].STATE %></p>
+<p>Observed: <%= sortedSightings[index].OBSERVED %></p>
+<hr />
+<% } %>

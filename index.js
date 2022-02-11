@@ -35,12 +35,12 @@ app.get('/', (req, res) => {
   // DOING
   read('data.json', (err, content) => {
     const sorting = req.query.sortBy;
-    const uppercase = sorting.toUpperCase();
+    // const uppercase = sorting.toUpperCase();
     const { sightings } = content;
     if (err) {
       console.log('Read error', err);
     }
-    const sortedSightings = sortBy(sightings, [uppercase]);
+    const sortedSightings = sortBy(sightings, [sorting]);
     res.render('indexFilter', { sortedSightings });
     // console.log(sortedSightings);
   });
