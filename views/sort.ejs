@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h2>Sort year sightings with select element</h2>
+    <p>The select element defines a drop-down list:</p>
+
+    <form action="/year-sightings">
+      <label for="sort">sort:</label>
+      <select id="order" name="order">
+        <option value="asc">ASC</option>
+        <option value="desc">DESC</option>
+      </select>
+      <input type="submit" />
+    </form>
+
+    <% if (sortOrder === "asc") { %>
+    <!-- sort by year -->
+    <% allSightings.sort((a, b) => a.Month.localeCompare(b.Month) )%> <% } %> <%
+    for( let index = 0; index < allSightings.length; index++ ) { %>
+    <p>Month: <%= allSightings[index].MONTH %></p>
+    <% } %>
+  </body>
+</html>

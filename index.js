@@ -1,9 +1,35 @@
 import express from 'express';
 import sortBy from 'lodash/sortBy.js';
-import { read } from './dataStorage.js';
+import { read, add } from './dataStorage.js';
 
 const app = express();
 app.set('view engine', 'ejs');
+app.use(express.urlencoded({ extended: false }));
+
+// form for input
+app.get('/form', (req, res) => {
+  res.render('form');
+});
+// manipulate form data
+app.post('/form', (req, res) => {
+  add('data.json', 'sightings', req.body, (err, content) => {
+    if (err) {
+      console.log('Add error', err);
+    }
+    // res.send('Added your data successfully!');
+    res.status(200).redirect('/form-submit');
+  });
+});
+
+app.get('/form-submit', (req, res) => {
+  read('data.json', (err, content) => {
+    if (err) {
+      console.log('Read error', err);
+    }
+    const { sightings } = content;
+    res.render('formSubmit', { sightings });
+  });
+});
 
 // ejs - display each key in DATA except for observed
 app.get('/index', (req, res) => {
@@ -32,7 +58,6 @@ app.get('/index', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  // DOING
   read('data.json', (err, content) => {
     const sorting = req.query.sortBy;
     // const uppercase = sorting.toUpperCase();
@@ -120,27 +145,37 @@ app.get('/year-sightings/:year', (request, response) => {
   });
 });
 
-app.get('/year-sightings', (request, response) => {
+app.get('/year-sightings', (req, res) => {
+  // give asc or des
+  const { sort } = req.query;
   read('data.json', (err, content) => {
     const { sightings } = content;
-    // sort sightings in ascending order
-    const sortedSightings = sortBy(sightings, ['STATE']);
-    // console.log(sightings);
-    const string = sortedSightings.map((sighting) => {
-      return `${sighting.STATE}<br/>`;
-    });
-    // string.sort();
-    content = `
-      <html>
-        <body>
-          <h1>hello</h1>
-          ${string}<br/>
-        </body>
-      </html>
-    `;
-    response.send(content);
+    const data = { sortOrder: sort, allSightings: sightings };
+    res.render('sort', data);
   });
 });
+
+// app.get('/year-sightings', (request, response) => {
+//   read('data.json', (err, content) => {
+//     const { sightings } = content;
+//     // sort sightings in ascending order
+//     const sortedSightings = sortBy(sightings, ['STATE']);
+//     // console.log(sightings);
+//     const string = sortedSightings.map((sighting) => {
+//       return `${sighting.STATE}<br/>`;
+//     });
+//     // string.sort();
+//     content = `
+//       <html>
+//         <body>
+//           <h1>hello</h1>
+//           ${string}<br/>
+//         </body>
+//       </html>
+//     `;
+//     response.send(content);
+//   });
+// });
 
 app.get('/apple', (req, res, next) => {
   console.log('Apple');
